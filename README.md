@@ -12,9 +12,7 @@
 - 프론트엔드 개발 흐름 경험
 
 ## 🛠 사용 기술
-- HTML
-- CSS
-- JavaScript
+- Xcode
 
 ## 📂 프로젝트 구조
 - index.html : 메인 화면
