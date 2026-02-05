@@ -1,0 +1,120 @@
+//
+//  ContentView.swift
+//  List-uP!(my first app)
+//
+//  Created by 김지우 on 1/27/26.
+//
+
+import SwiftUI
+
+// ✅ 모델 (Task 이름 충돌 방지)
+struct TodoItem: Identifiable, Codable, Equatable {
+    let id: UUID
+    var title: String
+    var dueDate: Date
+
+    init(id: UUID = UUID(), title: String, dueDate: Date) {
+        self.id = id
+        self.title = title
+        self.dueDate = dueDate
+    }
+}
+
+// ✅ 저장소
+struct TodoStorage {
+    private static let key = "todos"
+
+    static func save(_ items: [TodoItem]) {
+        if let data = try? JSONEncoder().encode(items) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+
+    static func load() -> [TodoItem] {
+        if let data = UserDefaults.standard.data(forKey: key),
+           let items = try? JSONDecoder().decode([TodoItem].self, from: data) {
+            return items
+        }
+        return []
+    }
+}
+
+// ✅ 메인 화면
+struct ContentView: View {
+    @State private var items: [TodoItem] = TodoStorage.load()
+    @State private var showAddView = false
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(items) { item in
+                    VStack(alignment: .leading) {
+                        Text(item.title)
+                            .font(.headline)
+                        Text(item.dueDate, style: .date)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
+                .onDelete(perform: deleteItem)
+            }
+            .navigationTitle("할 일 정리")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    EditButton()
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showAddView = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $showAddView) {
+                AddTodoView(items: $items)
+            }
+        }
+        .onChange(of: items) {
+            TodoStorage.save(items)
+        }
+    }
+
+    // ✅ 반드시 여기
+    private func deleteItem(at offsets: IndexSet) {
+        items.remove(atOffsets: offsets)
+    }
+}
+// ✅ 할 일 추가 화면
+struct AddTodoView: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var items: [TodoItem]
+
+    @State private var title = ""
+    @State private var dueDate = Date()
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                TextField("할 일 작성", text: $title)
+                DatePicker("마감일", selection: $dueDate, displayedComponents: .date)
+            }
+            .navigationTitle("할 일 추가")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("저장") {
+                        let newItem = TodoItem(title: title, dueDate: dueDate)
+                        items.append(newItem)
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("취소") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
