@@ -1,0 +1,16 @@
+//
+//  List_uP__my_first_app_Tests.swift
+//  List-uP!(my first app)Tests
+//
+//  Created by 김지우 on 1/27/26.
+//
+
+import Testing
+
+struct List_uP__my_first_app_Tests {
+
+    @Test func example() async throws {
+        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    }
+
+}
