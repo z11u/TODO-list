@@ -1,0 +1,32 @@
+//
+//  List_uP__my_first_app_App.swift
+//  List-uP!(my first app)
+//
+//  Created by 김지우 on 1/27/26.
+//
+
+import SwiftUI
+import SwiftData
+
+@main
+struct List_uP__my_first_app_App: App {
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([
+            Item.self,
+        ])
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+
+        do {
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+        .modelContainer(sharedModelContainer)
+    }
+}
